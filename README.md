@@ -1,16 +1,33 @@
-# React + Vite
+# Portal de Endomarketing — Grupo MM
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Ferramentas de autoatendimento para produzir materiais internos padronizados
+(ver `Descricao.md`). Acesso pela rede interna, sem login.
 
-Currently, two official plugins are available:
+## Rodar
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+npm run dev     # desenvolvimento
+npm run build   # gera a pasta dist/ para publicar na rede interna
+```
 
-## React Compiler
+## Funcionalidades
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Tela | Pasta |
+| --- | --- |
+| 3.1 Cronograma do Café | `src/pages/Cafe` |
+| 3.2 Assinatura de E-mail | `src/pages/Assinatura` |
+| 3.3 Foto Corporativa | `src/pages/Foto` |
+| 3.4 Calendário de Aniversariantes | `src/pages/Aniversario` |
+| 3.5 Materiais para Download | `src/pages/Materiais` |
 
-## Expanding the ESLint configuration
+## Imagens
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Todas as imagens são referenciadas em **`src/constants/imagens.js`**.
+Campos vazios (`""`) aparecem na interface como espaço reservado.
+
+1. Coloque o arquivo em `src/assets/<pasta>` (`cafe`, `molduras`, `aniversario`, `materiais`).
+2. Importe-o em `src/constants/imagens.js` e troque a string vazia pela variável.
+
+Não use imagens em base64 no código. Para as molduras, ajuste também
+`fx`, `fy` e `fr` em `src/data/molduras.js` (centro e raio do recorte da foto).
