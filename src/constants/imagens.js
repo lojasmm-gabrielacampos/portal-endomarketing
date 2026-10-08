@@ -14,6 +14,16 @@
 import logoGrupoMM from "../assets/logo-grupo-mm.png";
 import xicoriaAssinatura from "../assets/xicoria-assinatura.png";
 
+import meet1 from "../assets/materiais/fundo-meet-1.png";
+import meet2 from "../assets/materiais/fundo-meet-2.png";
+import meet3 from "../assets/materiais/fundo-meet-3.png";
+import meet4 from "../assets/materiais/fundo-meet-4.png";
+import meet5 from "../assets/materiais/fundo-meet-5.png";
+import meet6 from "../assets/materiais/fundo-meet-6.png";
+import meet7 from "../assets/materiais/fundo-meet-7.png";
+
+import linkedin1 from "../assets/materiais/capa-linkedin-1.jpeg";
+
 export const IMAGENS = {
   // Marca (interface do portal, assinatura e artes geradas)
   logo: logoGrupoMM,
@@ -44,7 +54,7 @@ export const IMAGENS = {
 
   // 3.5 Materiais para download — pasta: src/assets/materiais/
   materiais: {
-    meet: ["", "", ""],     // planos de fundo Google Meet (1920 × 1080)
-    linkedin: ["", "", ""], // capas LinkedIn (1584 × 396)
+    meet: [meet1, meet2, meet3, meet4, meet5, meet6, meet7],     // planos de fundo Google Meet (1920 × 1080)
+    linkedin: [linkedin1], // capas LinkedIn (1584 × 396)
   },
 };
