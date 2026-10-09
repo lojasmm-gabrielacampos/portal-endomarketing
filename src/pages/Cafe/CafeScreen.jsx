@@ -9,7 +9,7 @@ import { construirMuralSVG, MURAL_W, MURAL_H } from "./muralSvg";
 export default function CafeScreen() {
   const hoje = new Date();
   const [mes, setMes] = useState(hoje.getMonth());
-  const [ano, setAno] = useState(hoje.getFullYear());
+  const [ano, setAno] = useState(ANOS.includes(hoje.getFullYear()) ? hoje.getFullYear() : ANOS[0]);
   const [porDia, setPorDia] = useState(2);
   const [sabado, setSabado] = useState(false);
   const [texto, setTexto] = useState("");

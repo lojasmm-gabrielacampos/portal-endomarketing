@@ -1,0 +1,293 @@
+/* ---------- Calendário de Aniversariantes ---------- Complementa o app.css (tokens --red, --ink, --line, --tint…). As cores dos meses (--cor-mes) vêm da arte, via corDoMes() em calendarioSvg.js. */
+ .aniv-card{
+    display:flex;
+    flex-direction:column;
+    gap:14px
+}
+ .aniv-card .calc-note,.aniv-card .warn-note{
+    margin-top:0
+}
+ .aniv-card .gen-row{
+    margin-top:6px
+}
+/* Ano (usa o .segmented do app) */
+ .aniv-anos{
+    max-width:260px
+}
+ .aniv-anos button{
+    display:inline-flex;
+    align-items:baseline;
+    justify-content:center;
+    gap:6px
+}
+ .aniv-anos small{
+    font-size:12px;
+    font-weight:600;
+    opacity:.75
+}
+ .aniv-copiar{
+    align-self:flex-start
+}
+/* Navegação do mês */
+ .aniv-nav{
+    display:grid;
+    grid-template-columns:auto 1fr auto;
+    align-items:center;
+    gap:8px
+}
+ .aniv-mes{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:8px 12px;
+    border-radius:var(--r-sm);
+    background:var(--cor-mes);
+    color:#fff;
+    text-align:center
+}
+ .aniv-mes strong{
+    font-family:'Archivo','Inter',sans-serif;
+    font-size:16px;
+    font-weight:800;
+    line-height:1.1;
+    letter-spacing:.02em;
+    text-transform:uppercase
+}
+ .aniv-mes span{
+    font-size:16px;
+    opacity:.92
+}
+ .aniv-seta{
+    width:40px;
+    height:40px;
+    display:grid;
+    place-items:center;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:#fff;
+    color:var(--ink);
+    transition:border-color .15s,color .15s
+}
+ .aniv-seta:hover{
+    border-color:var(--cor-mes);
+    color:var(--cor-mes)
+}
+ .aniv-chips{
+    display:grid;
+    grid-template-columns:repeat(12,1fr);
+    gap:4px
+}
+ .aniv-chip{
+    position:relative;
+    border:1px solid var(--line);
+    background:#fff;
+    border-radius:8px;
+    padding:6px 0;
+    font-size:12px;
+    font-weight:600;
+    color:var(--muted)
+}
+ .aniv-chip small{
+    position:absolute;
+    top:-7px;
+    right:-4px;
+    min-width:17px;
+    height:17px;
+    padding:0 4px;
+    border-radius:9px;
+    background:var(--cor-mes);
+    color:#fff;
+    font-size:12px;
+    line-height:17px
+}
+ .aniv-chip.is-ativo{
+    border-color:var(--cor-mes);
+    color:var(--ink);
+    box-shadow:inset 0 -3px 0 var(--cor-mes)
+}
+/* Entrada rápida */
+ .aniv-entrada{
+    display:grid;
+    grid-template-columns:68px 1fr auto;
+    gap:8px
+}
+ .aniv-dia{
+    text-align:center;
+    font-weight:700
+}
+ .aniv-add{
+    white-space:nowrap
+}
+ .aniv-dica{
+    margin-top:-6px;
+    font-size:11.5px;
+    color:var(--muted)
+}
+ .aniv-dica.is-erro{
+    color:var(--red-700);
+    font-weight:600
+}
+/* Lista editável */
+ .aniv-lista{
+    list-style:none;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    max-height:340px;
+    overflow-y:auto;
+    border-top:1px solid var(--line);
+    padding-top:8px;
+}
+ .aniv-item{
+    display:flex;
+    flex-direction:column;
+}
+ .aniv-sep{
+    margin:6px 0 4px;
+    padding-left:8px;
+    font-size:11px;
+    font-weight:600;
+    color:var(--muted)
+}
+ .aniv-linha{
+    display:grid;
+    grid-template-columns:46px 10px 1fr auto auto;
+    align-items:center;
+    gap:4px;
+    padding:2px 4px;
+    border-radius:9px;
+    transition:background-color .6s;
+}
+ .aniv-linha:hover,.aniv-linha:focus-within{
+    background:var(--paper)
+}
+ .aniv-linha.is-recente{
+    background:var(--tint);
+    transition:none
+}
+ .aniv-linha.is-fora .aniv-campo{
+    color:var(--muted);
+    text-decoration:line-through
+}
+ .aniv-campo{
+    width:100%;
+    min-width:0;
+    border:1px solid transparent;
+    border-radius:8px;
+    padding:6px 8px;
+    background:transparent;
+    font:inherit;
+    font-size:14px;
+    color:var(--ink);
+    transition:border-color .15s,box-shadow .15s
+}
+ .aniv-campo:hover{
+    border-color:var(--line)
+}
+ .aniv-campo:focus{
+    outline:none;
+    border-color:var(--red);
+    background:#fff;
+    box-shadow:0 0 0 3px var(--tint)
+}
+ .aniv-campo-dia{
+    text-align:right;
+    font-weight:700
+}
+ .aniv-ponto{
+    text-align:center;
+    color:var(--muted)
+}
+ .aniv-tag{
+    font-size:10px;
+    font-weight:600;
+    color:var(--red-800);
+    background:var(--tint-2);
+    border-radius:6px;
+    padding:2px 6px
+}
+ .aniv-remover{
+    width:28px;
+    height:28px;
+    display:grid;
+    place-items:center;
+    border:0;
+    border-radius:7px;
+    background:transparent;
+    color:var(--muted)
+}
+ .aniv-remover:hover,.aniv-remover:focus-visible{
+    background:var(--tint);
+    color:var(--red-700)
+}
+ .aniv-desfazer{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:9px 12px;
+    border-radius:10px;
+    background:var(--ink);
+    color:#fff;
+    font-size:12.5px
+}
+ .aniv-desfazer button{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    border:0;
+    background:transparent;
+    color:#fff;
+    font-weight:700;
+    text-decoration:underline
+}
+/* Prévia: áreas clicáveis por cima das caixas dos meses */
+ .aniv-preview{
+    position:relative;
+    width:100%;
+    aspect-ratio:900/1273
+}
+ .aniv-arte{
+    width:100%;
+    height:100%;
+    border-radius:8px;
+    overflow:hidden;
+    box-shadow:0 3px 12px -6px rgba(0,0,0,.28);
+    background:#fff
+}
+ .aniv-arte svg{
+    display:block;
+    width:100%;
+    height:100%
+}
+ .aniv-alvo{
+    position:absolute;
+    padding:0;
+    border:0;
+    border-radius:1.3%;
+    background:transparent;
+}
+ .aniv-alvo:hover{
+    box-shadow:0 0 0 2px rgba(32,27,28,.2)
+}
+ .aniv-alvo.is-ativo{
+    box-shadow:0 0 0 2px var(--ink),0 0 0 4px #fff;
+    font-size: 24px;
+}
+/* Foco visível no padrão do app */
+ .aniv-seta:focus-visible,.aniv-chip:focus-visible,.aniv-desfazer button:focus-visible{
+    outline:2px solid var(--red);
+    outline-offset:2px
+}
+ @media (max-width:600px){
+     .aniv-chips{
+        grid-template-columns:repeat(6,1fr)
+    }
+     .aniv-entrada{
+        grid-template-columns:60px 1fr
+    }
+     .aniv-add{
+        grid-column:1 / -1
+    }
+}
+ 

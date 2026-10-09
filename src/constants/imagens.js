@@ -22,6 +22,9 @@ import meet5 from "../assets/materiais/fundo-meet-5.png";
 import meet6 from "../assets/materiais/fundo-meet-6.png";
 import meet7 from "../assets/materiais/fundo-meet-7.png";
 
+import moldura1 from "../assets/molduras/moldura-1.png";
+import moldura2 from "../assets/molduras/moldura-2.png";
+
 import linkedin1 from "../assets/materiais/capa-linkedin-1.jpeg";
 
 export const IMAGENS = {
@@ -43,8 +46,8 @@ export const IMAGENS = {
   // 3.3 Foto corporativa — pasta: src/assets/molduras/
   // PNG quadrado com o centro transparente (onde entra a foto).
   molduras: {
-    souMM: "",
-    orgulhoEmPertencer: "",
+    souMM: moldura1,
+    orgulhoEmPertencer: moldura2,
   },
 
   // 3.4 Calendário de aniversariantes — pasta: src/assets/aniversario/

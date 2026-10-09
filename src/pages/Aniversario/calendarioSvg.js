@@ -1,72 +1,271 @@
-import { CORES, LOGO_MM } from "../../constants/brand";
+
 import { IMAGENS } from "../../constants/imagens";
 import { MESES } from "../../constants/cafe";
-import { escapeHtml as esc, pad2 } from "../../utils/format";
+import { escapeHtml as esc } from "../../utils/format";
 
-// Dimensões da arte (proporção A4 retrato)
+// Arte anual "Feliz Aniversário" (base: Aniversariantes_Anual.pdf, A4 retrato).
 export const CAL_W = 900;
 export const CAL_H = 1273;
 
-const { red, red700, ink, cream, line, yellow } = CORES;
-const DISP = "'Archivo','Arial Black',Arial,sans-serif";
-const BODY = "Arial,Helvetica,sans-serif";
+// Cores medidas na arte original.
+export const COR_ARTE = {
+  vermelho: "#e1101b",
+  amarelo: "#f9b804",
+  amareloFaixa: "#fcde33",
+  texto: "#1f1f1f",
+};
 
-// Gera a arte do calendário de aniversariantes do mês (formato "dia | nome").
-export function construirCalendarioSVG({ mes, lista }) {
-  const W = CAL_W, H = CAL_H;
-  const cx0 = 100, cx1 = 860, barW = 64;
+// Janeiro vermelho, fevereiro amarelo, e assim por diante.
+export const corDoMes = (mes) =>
+  mes % 2 === 0 ? COR_ARTE.vermelho : COR_ARTE.amarelo;
 
-  const sidebar =
-    `<rect x="0" y="0" width="${barW}" height="${H}" fill="${red}"/>` +
-    `<text x="${barW / 2}" y="${H * 0.6}" transform="rotate(-90 ${barW / 2} ${H * 0.6})" text-anchor="middle" font-family="${DISP}" font-weight="800" font-size="24" letter-spacing="6" fill="${yellow}">ANIVERSARIANTES</text>`;
+// Arquivos das fontes da arte (.woff2/.ttf).
+export const FONTES_ARTE = {
+  titulo: null, // Bobby Jones (títulos dos meses)
+  nome: null,   // DM Sans Regular (dias e nomes)
+};
 
-  const header =
-    `<text x="${cx0}" y="98" font-family="${DISP}" font-weight="800" font-size="40" letter-spacing="-1" fill="${ink}">ANIVERSARIANTES</text>` +
-    `<text x="${cx0}" y="128" font-family="${DISP}" font-weight="700" font-size="13" letter-spacing="3" fill="#8a8284">PARABÉNS A TODOS QUE FAZEM ANIVERSÁRIO NESTE MÊS</text>`;
+const FONTE_TITULO =
+  "'Bobby Jones','Archivo Narrow','Archivo','Arial Narrow','Arial Black',sans-serif";
+const FONTE_NOME = "'DM Sans',Arial,Helvetica,sans-serif";
 
-  const badgeW = 196, badgeH = 44, bX = cx1 - badgeW, bY = 64;
-  const badge =
-    `<rect x="${bX}" y="${bY}" width="${badgeW}" height="${badgeH}" rx="${badgeH / 2}" fill="${yellow}"/>` +
-    `<text x="${bX + badgeW / 2}" y="${bY + badgeH / 2 + 6}" text-anchor="middle" font-family="${DISP}" font-weight="800" font-size="18" fill="${red700}">${esc(MESES[mes])}</text>`;
+// Grade 3 × 4 com as mesmas medidas da arte.
+const GRADE = {
+  x0: 35,
+  y0: 199,
+  w: 262,
+  h: 229,
+  gx: 22,
+  gy: 24,
+  cab: 42,
+  borda: 4,
+  raio: 11,
+};
 
-  const rule = `<rect x="${cx0}" y="150" width="${cx1 - cx0}" height="4" rx="2" fill="${red}"/>`;
+// Área dos nomes dentro de cada caixa.
+const LISTA = {
+  topo: 46,
+  base: 8,
+  padX: 14,
+  gapCol: 12,
+};
 
-  // Ilustração do topo: espaço reservado até ser referenciada em src/constants/imagens.js
-  const iY = 180, iH = 230;
-  const ilustracao = IMAGENS.aniversario.ilustracao
-    ? `<image href="${IMAGENS.aniversario.ilustracao}" x="${cx0}" y="${iY}" width="${cx1 - cx0}" height="${iH}" preserveAspectRatio="xMidYMid meet"/>`
-    : `<rect x="${cx0}" y="${iY}" width="${cx1 - cx0}" height="${iH}" rx="14" fill="#FAFAFA" stroke="#CFC8C9" stroke-width="2" stroke-dasharray="8 6"/>` +
-      `<text x="${(cx0 + cx1) / 2}" y="${iY + iH / 2 + 6}" text-anchor="middle" font-family="${BODY}" font-size="16" fill="#A49C9D">Ilustração do calendário</text>`;
+const FS_MAX = 19;
+const FS_MIN = 12;
+const FS_MIN_LOTADO = 12;
+const ENTRELINHA = 1.5;
 
-  // Lista "dia | nome" — 1, 2 ou 3 colunas conforme a quantidade
-  const lTop = iY + iH + 40, lBottom = 1150;
-  let corpo = "";
-  if (lista.length === 0) {
-    corpo = `<text x="${(cx0 + cx1) / 2}" y="${lTop + 120}" text-anchor="middle" font-family="${BODY}" font-size="16" fill="#a49c9d">Adicione os aniversariantes para montar o calendário.</text>`;
-  } else {
-    const cols = lista.length > 48 ? 3 : lista.length > 16 ? 2 : 1;
-    const porCol = Math.ceil(lista.length / cols);
-    const gap = 24;
-    const colW = (cx1 - cx0 - gap * (cols - 1)) / cols;
-    const rowH = Math.min(46, (lBottom - lTop) / porCol);
-    const fs = Math.max(11, Math.min(22, rowH * 0.48));
+// Quantidade fixa de linhas em cada coluna.
+const MAX_LINHAS = 6;
 
-    lista.forEach((p, i) => {
-      const c = Math.floor(i / porCol), r = i % porCol;
-      const x = cx0 + c * (colW + gap), y = lTop + r * rowH;
-      const ty = y + rowH / 2 + fs * 0.35;
-      if (r % 2 === 1) corpo += `<rect x="${x}" y="${y}" width="${colW}" height="${rowH}" fill="${cream}"/>`;
-      corpo += `<line x1="${x}" y1="${y + rowH}" x2="${x + colW}" y2="${y + rowH}" stroke="${line}" stroke-width="1"/>`;
-      corpo += `<text x="${x + 14}" y="${ty}" font-family="${DISP}" font-size="${fs}" fill="${ink}">` +
-        `<tspan font-weight="800" fill="${red}">${pad2(p.dia)}</tspan>` +
-        `<tspan fill="#B7B0B1" font-weight="400"> | </tspan>` +
-        `<tspan font-family="${BODY}" font-weight="600">${esc(p.nome)}</tspan></text>`;
-    });
+// Posições relativas ao início da coluna, em "em".
+const RECUO_DIA = 1.2;
+const RECUO_PONTO = 1.5;
+const RECUO_NOME = 1.8;
+
+export function caixaDoMes(mes) {
+  const c = mes % 3;
+  const l = Math.floor(mes / 3);
+
+  return {
+    x: GRADE.x0 + c * (GRADE.w + GRADE.gx),
+    y: GRADE.y0 + l * (GRADE.h + GRADE.gy),
+    w: GRADE.w,
+    h: GRADE.h,
+  };
+}
+
+const larguraColuna =
+  (GRADE.w - LISTA.padX * 2 - LISTA.gapCol) / 2;
+
+const alturaLista =
+  GRADE.h - LISTA.topo - LISTA.base;
+
+// Sempre considera 6 linhas por coluna.
+const linhasPorColuna = () => MAX_LINHAS;
+
+const larguraNome = (fs) =>
+  larguraColuna - fs * RECUO_NOME;
+
+let ctx;
+
+function medir(texto, fs) {
+  if (ctx === undefined) {
+    try {
+      ctx = document.createElement("canvas").getContext("2d");
+    } catch {
+      ctx = null;
+    }
   }
 
-  const logo = `<image href="${LOGO_MM}" x="${cx1 - 170}" y="1170" width="170" height="88" preserveAspectRatio="xMaxYMid meet"/>`;
+  if (!ctx) return texto.length * fs * 0.56;
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">` +
-    `<rect x="0" y="0" width="${W}" height="${H}" fill="#ffffff"/>` +
-    sidebar + header + badge + rule + ilustracao + corpo + logo + `</svg>`;
+  ctx.font = `400 ${fs}px ${FONTE_NOME}`;
+  return ctx.measureText(texto).width;
+}
+
+function caber(texto, fs, max) {
+  if (medir(texto, fs) <= max) return texto;
+
+  let a = 0;
+  let b = texto.length;
+
+  while (a < b) {
+    const m = Math.ceil((a + b) / 2);
+
+    if (
+      medir(texto.slice(0, m).trimEnd() + "…", fs) <= max
+    ) {
+      a = m;
+    } else {
+      b = m - 1;
+    }
+  }
+
+  return texto.slice(0, a).trimEnd() + "…";
+}
+
+// Decide o tamanho da fonte e a coluna de cada pessoa.
+// A primeira coluna enche primeiro; o restante vai para a segunda.
+// Cada coluna comporta até 6 linhas.
+
+export function calcularLayout(meses) {
+  return meses.map((lista) => {
+    // Cada mês calcula seu próprio tamanho de fonte.
+    let fs = FS_MAX;
+
+    const linhas = MAX_LINHAS;
+    const capacidade = linhas * 2;
+
+    // Procura a maior fonte que acomode os nomes deste mês,
+    // respeitando a altura disponível e as 6 linhas por coluna.
+    const nomes = lista.slice(0, capacidade).map((p) => p.nome);
+
+    while (fs > FS_MIN) {
+      const cabeNaLargura = nomes.every(
+        (nome) => medir(nome, fs) <= larguraNome(fs)
+      );
+
+      const cabeNaAltura =
+        fs * ENTRELINHA * MAX_LINHAS <= alturaLista;
+
+      if (cabeNaLargura && cabeNaAltura) break;
+
+      fs -= 0.5;
+    }
+
+    const itens = lista.slice(0, capacidade).map((p, i) => {
+      const col = i < linhas ? 0 : 1;
+
+      const texto = caber(
+        p.nome,
+        fs,
+        larguraNome(fs)
+      );
+
+      return {
+        ...p,
+        col,
+        lin: col ? i - linhas : i,
+        texto,
+        truncado: texto !== p.nome,
+      };
+    });
+
+    return {
+      fs,
+      linhas,
+      itens,
+      excedentes: lista.slice(capacidade),
+    };
+  });
+}
+
+function espacoImagem(href, x, y, w, h, rotulo) {
+  if (href) {
+    return `<image href="${href}" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid meet"/>`;
+  }
+
+  return (
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="none" stroke="#cfc8c9" stroke-width="2" stroke-dasharray="7 6"/>` +
+    `<text x="${x + w / 2}" y="${y + h / 2 + 5}" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" fill="#a49c9d">${rotulo}</text>`
+  );
+}
+
+function estiloFontes() {
+  const face = (familia, url) =>
+    url
+      ? `@font-face{font-family:'${familia}';src:url("${url}");}`
+      : "";
+
+  const css =
+    face("Bobby Jones", FONTES_ARTE.titulo) +
+    face("DM Sans", FONTES_ARTE.nome);
+
+  return css ? `<defs><style>${css}</style></defs>` : "";
+}
+
+export function construirCalendarioSVG({ meses }) {
+  const W = CAL_W;
+  const H = CAL_H;
+
+  const { vermelho, amareloFaixa, texto } = COR_ARTE;
+  const img = IMAGENS.aniversario || {};
+  const layout = calcularLayout(meses);
+
+  // Faixas dos cantos superiores.
+  const faixas =
+    `<path d="M0 0 H236 C168 26 86 58 0 88 Z" fill="${amareloFaixa}"/>` +
+    `<path d="M0 0 H208 C142 20 66 40 0 58 Z" fill="${vermelho}"/>` +
+    `<path d="M694 0 H${W} V68 C842 42 768 16 694 0 Z" fill="${vermelho}"/>`;
+
+  // Espaços para as artes do cabeçalho.
+  const cabecalho =
+    espacoImagem(img.titulo, 305, 24, 300, 142, "Arte “Feliz Aniversário”") +
+    espacoImagem(img.logo, 650, 72, 160, 48, "Logo Grupo MM");
+
+  let caixas = "";
+
+  layout.forEach((m, mes) => {
+    const { x, y, w, h } = caixaDoMes(mes);
+    const cor = corDoMes(mes);
+    const { cab, borda, raio } = GRADE;
+
+    caixas +=
+      `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${raio}" fill="${cor}"/>` +
+      `<rect x="${x + borda}" y="${y + cab}" width="${w - borda * 2}" height="${h - cab - borda}" rx="${raio - 4}" fill="#ffffff"/>` +
+      `<text x="${x + w / 2}" y="${y + cab / 2 + 9}" text-anchor="middle" font-family="${FONTE_TITULO}" font-weight="700" font-size="26" letter-spacing="0.5" fill="#ffffff">${esc(MESES[mes].toLocaleUpperCase("pt-BR"))}</text>`;
+
+    const pitch = m.fs * ENTRELINHA;
+
+    m.itens.forEach((p) => {
+      const cx =
+        x + LISTA.padX + p.col * (larguraColuna + LISTA.gapCol);
+
+      const by = (
+        y +
+        LISTA.topo +
+        pitch * (p.lin + 0.5) +
+        m.fs * 0.35
+      ).toFixed(1);
+
+      const base =
+        `y="${by}" font-family="${FONTE_NOME}" font-size="${m.fs}" fill="${texto}"`;
+
+      caixas +=
+        `<text x="${(cx + m.fs * RECUO_DIA).toFixed(1)}" ${base} text-anchor="end">${p.dia}</text>` +
+        `<text x="${(cx + m.fs * RECUO_PONTO).toFixed(1)}" ${base} text-anchor="middle">·</text>` +
+        `<text x="${(cx + m.fs * RECUO_NOME).toFixed(1)}" ${base}>${esc(p.texto)}</text>`;
+    });
+  });
+
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">` +
+    estiloFontes() +
+    `<rect width="${W}" height="${H}" fill="#ffffff"/>` +
+    faixas +
+    cabecalho +
+    caixas +
+    `</svg>`
+  );
 }
